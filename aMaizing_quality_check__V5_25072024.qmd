@@ -1,0 +1,1537 @@
+---
+title: "aMaizing_Wed732024"
+author: "Njambi"
+format: html
+editor: visual
+---
+
+## Clear the environment
+
+```{r}
+
+rm(list = ls())
+
+```
+
+## Loading necessary libraries
+
+```{r, include=FALSE}
+
+library(tidyverse) # includes the dplyr, ggplot2, tidyr, readr, stringr, forcats, tibble packages
+library(readxl)
+library(Hmisc)
+library(labelled)
+library(magrittr)
+library(datawizard)
+library(gtsummary)
+library(gt)
+library(kableExtra)
+library(flextable)
+library(splitstackshape)
+library(lubridate)
+library(foreign)
+library(haven)
+library(viridis)
+library(ggthemes)
+library(hrbrthemes)
+library(patchwork)
+library(gridExtra)
+library(scales)
+library(reshape2)
+library(janitor)
+library(dlookr)
+library(summarytools)
+library(devtools)
+library(KoboconnectR)
+
+```
+
+```{r}
+# Set working directory (Not necessary since the current wd is the correct wd)
+
+setwd("C:\\Users\\awanjau\\OneDrive - CGIAR\\Alliance\\Alliance_2024\\AMAZING\\aMaizingEndlineSurvey\\aMaizingEndlineDataCleaning_5")
+  
+  
+```
+
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+# Install devtools if you haven't already
+#install.packages("devtools")
+
+# Load devtools
+
+
+# # Install koboAPI from GitHub
+# devtools::install_github("mrdwab/koboAPI")
+# 
+# # Load the koboAPI package
+# library(koboAPI)
+
+#use kobotoolbox package instead
+
+#library(kobotoolbox)
+
+
+## To read: https://www.r-bloggers.com/2022/03/how-to-download-kobotoolbox-data-in-r/ 
+
+
+
+
+```
+
+```{r, warning=FALSE, message=FALSE}
+#Load data
+
+amaizing_endlinedata_v5 <- read_excel("C:\\Users\\awanjau\\OneDrive - CGIAR\\Alliance\\Alliance_2024\\AMAZING\\aMaizingEndlineSurvey\\aMaizingEndlineRawData\\aMaizing_Crop_Insurance_Program_endline_Survey_-_all_versions_-_labels_-_2024-07-25-10-25-42.xlsx")
+  
+  
+  
+dim(amaizing_endlinedata_v5)
+
+#names(amaizing_endlinedata_v5)
+
+```
+
+```{r}
+
+amaizing_endlinedata_clean_v5 <- amaizing_endlinedata_v5 %>%
+  dplyr::select( 7:137, 145)
+dim(amaizing_endlinedata_clean_v5)
+
+```
+
+```{r}
+#names(amaizing_endlinedata_clean_v5)
+```
+
+```{r}
+
+# Create new column names
+  
+amaizing_endlinedata_clean_v5 <- amaizing_endlinedata_clean_v5 %>%
+  rename(
+    a1 = "A1. Name of the enumerator.", 
+    a2 = "A2. Do you agree to participate in this interview?",
+    sec_crop_activity = "In the next section we are going to talk about your cropping activities",  
+    crop = "crop",
+    c1 = "C1. Which crops have you been planting since 2021?",   
+    c1_1 = "C1.1. Which other crops are you currently doing (2023)?", 
+    c2 = "C2. Did you buy crop insurance cover in 2022 and/or 2023?",  
+    c2_1 =  "C2.1. Did you buy insurance for \"${crop}\"?",   
+    c2_2 = "C2.2. From which provider did you buy from?",  
+    c3 = "C3. Who informed you about insurance?", 
+    c4 = "C4. How many acres of land do you use for farming \"${crop}\"?", 
+    c5 = "C5. Is the crop in 2021 different from 2022/2023 crop?", 
+    c5_1 = "C5.1. If yes, which crop was it?",
+    c5_2 = "C5.2. Quantity of CROP harvested in 2021?",    
+    c5_3 = "C5.3. Unit of CROP harvested in 2021?",   
+    c5_4 = "C5.4. Prevailing price of a \"${c53}\" of CROP  in 2021?", 
+    c6 = "C6. Quantity of \"${crop}\" harvested in 2022 or 2023?",  
+    c6_1 = "C6.1. Unit of \"${crop}\" harvested in that year?", 
+    c6_2 = "C6.2. Prevailing price of a \"${c61}\" of \"${crop}\" in that year?",  
+    c7 = "C7. Quantity of \"${crop}\"  harvested in 2023?",  
+    c7_1 = "C7.1. Unit of \"${crop}\" harvested in 2023?", 
+    c7_2 = "C7.2. Prevailing price of a \"${c71}\" of \"${crop}\"  in 2023?",  
+    c8 = "C8. By how many acres are you interested in increasing the land under ${crop}?",
+    sec_impr_pracs = "In the next section, we will talk about improved practices you have introduced in your farm within the past two years",  
+    d1 = "D1. Are there any other crops, besides maize, green grams, beans and sorghum, that you would like to insure?",  
+    d2 = "D2. Which OTHER crop would you MAINLY want to cover?",    
+    d3 = "D3. Which on-farm investments or technologies have you introduced to your farm since 2022?",  
+    d3_impr_seeds = "D3. Which on-farm investments or technologies have you introduced to your farm since 2022?/Improved seeds",   
+    d3_inorg_fert = "D3. Which on-farm investments or technologies have you introduced to your farm since 2022?/Inorganic fertilizer",    
+    d3_org_fert = "D3. Which on-farm investments or technologies have you introduced to your farm since 2022?/Organic fertilizer",  
+    d3_waterh = "D3. Which on-farm investments or technologies have you introduced to your farm since 2022?/Water harvesting",   
+    d3_micro_drip = "D3. Which on-farm investments or technologies have you introduced to your farm since 2022?/Micro dripping",   
+    d3_mech_plough = "D3. Which on-farm investments or technologies have you introduced to your farm since 2022?/Mechanized ploughing",  
+    d3_ca = "D3. Which on-farm investments or technologies have you introduced to your farm since 2022?/CA (minimum soil disturbance, crop rotation & soil cover)",   
+    d3_agrofor = "D3. Which on-farm investments or technologies have you introduced to your farm since 2022?/Agroforestry",    
+    d3_ipm = "D3. Which on-farm investments or technologies have you introduced to your farm since 2022?/Integrated pest management",    
+    d3_none = "D3. Which on-farm investments or technologies have you introduced to your farm since 2022?/None",
+    d4 = "D4. What factor(s) influenced your decision to introduce the improved practice(s)?",   
+    d4_hyp = "D4. What factor(s) influenced your decision to introduce the improved practice(s)?/Higher yield potential",   
+    d4_cropins = "D4. What factor(s) influenced your decision to introduce the improved practice(s)?/Accessibility due to crop insurance",  
+    d4_disease_res = "D4. What factor(s) influenced your decision to introduce the improved practice(s)?/Disease resistance",  
+    d4_clim_res = "D4. What factor(s) influenced your decision to introduce the improved practice(s)?/Climate resilience", 
+    d4_cost_effect = "D4. What factor(s) influenced your decision to introduce the improved practice(s)?/Cost-effectiveness",    
+    d4_recommend = "D4. What factor(s) influenced your decision to introduce the improved practice(s)?/Recommendation by other farmers/extension officers", 
+    d4_soil_conserv = "D4. What factor(s) influenced your decision to introduce the improved practice(s)?/Soil conservation", 
+    d5 = "D5. Have you noticed an increase in crop yield since introducing the improved practice(s)?", 
+    d5_1 = "D5.1 Is this change different from the change in \"Module C\"",  
+    d6 = "D6. Quantity",     
+    d6_1 = "D6.1. By how much?",  
+    d6_2 = "D6.2. Quantity",  
+    d6_3 = "D6.3. By how much?",  
+    e1 = "E1. In 2021, did your family face situations where you were not sure where your next meal would come from, or were there days when some household members went to sleep without consuming enough food?",
+    e2 = "E2. In the last 6 months, have you worried about not having enough food for you or your family members?", 
+    e3 = "E3. Do you think that after purchasing insurance coverage, your family had stable access to diverse and nutritious food commodities?",    
+    sec_risk_mgt = "In the next section, we are going to talk about risk management practices on your farm.", 
+    f1 = "F1. In 2021, did you experience crop failure (loss or poor harvest)?",  
+    f2 = "F2. In the last 6 months, have you experienced crop failure (loss or poor harvest)?", 
+    f3 = "F3. Which risk management strategies did you implement on your farm in 2021 and before?", 
+    f3_div_crop = "F3. Which risk management strategies did you implement on your farm in 2021 and before?/Diversifying crops",  
+    f3_drought_res = "F3. Which risk management strategies did you implement on your farm in 2021 and before?/Using drought-resistant varieties",   
+    f3_agric_ins = "F3. Which risk management strategies did you implement on your farm in 2021 and before?/Purchasing agricultural insurance",  
+    f3_adjus_time = "F3. Which risk management strategies did you implement on your farm in 2021 and before?/Adjusting planting or harvesting times", 
+    f3_irrign = "F3. Which risk management strategies did you implement on your farm in 2021 and before?/Irrigation",
+    f3_ipm = "F3. Which risk management strategies did you implement on your farm in 2021 and before?/IPM", 
+    f3_slm = "F3. Which risk management strategies did you implement on your farm in 2021 and before?/SLM", 
+    f3_none = "F3. Which risk management strategies did you implement on your farm in 2021 and before?/None of the above",    
+    f4 = "F4. Which risk management strategies did you implement on your farm in the last one year?",  
+    f4_divers_crop = "F4. Which risk management strategies did you implement on your farm in the last one year?/Diversifying crops",   
+    f4_drought_res = "F4. Which risk management strategies did you implement on your farm in the last one year?/Using drought-resistant varieties",  
+    f4_agric_ins = "F4. Which risk management strategies did you implement on your farm in the last one year?/Purchasing agricultural insurance",  
+    f4_adjust_time = "F4. Which risk management strategies did you implement on your farm in the last one year?/Adjusting planting or harvesting times", 
+    f4_irrigation = "F4. Which risk management strategies did you implement on your farm in the last one year?/Irrigation",    
+    f4_ipm = "F4. Which risk management strategies did you implement on your farm in the last one year?/IPM",  
+    f4_slm = "F4. Which risk management strategies did you implement on your farm in the last one year?/SLM", 
+    f4_none = "F4. Which risk management strategies did you implement on your farm in the last one year?/None of the above",    
+    f5_scale = "F5. On a scale of 1 to 5, how has the insurance product helped you manage farm risks?  \n\n1 being \"not at all helpful\" and 5 being \"extremely helpful",
+    f6_no_ins = "F6. What is the main reason for not purchasing the insurance product despite registering for the project?", 
+    f7 = "F7. What would have MAINLY motivated you to purchase crop insurance?",
+    sec_ins_percn = "In the next section, we will talk about your perceptions on insurance.", 
+    g1 = "G1. Are you familiar with agricultural insurance options available for farmers in your area?",
+    g2 = "G2. In your opinion, what is the MAIN benefit of having crop insurance?",  
+    g3 = "G3. What do you think about the affordability of the premiums?",  
+    g4 = "G4. What challenge or barrier have you MAINLY faced in accessing agricultural insurance?",
+    g5 = "G5. Do you think the current agricultural insurance options meet the needs of farmers in your community?",
+    g6 = "G6. What improvements or changes would you like to see in agricultural insurance offerings for farmers?",
+    g6_afford_prem = "G6. What improvements or changes would you like to see in agricultural insurance offerings for farmers?/Affordable premiums", 
+    g6_simp_proc = "G6. What improvements or changes would you like to see in agricultural insurance offerings for farmers?/Simplified application processes",  
+    g6_clear_terms = "G6. What improvements or changes would you like to see in agricultural insurance offerings for farmers?/Clear terms",   
+    g6_increas_educ = "G6. What improvements or changes would you like to see in agricultural insurance offerings for farmers?/Increased education",  
+    g6_cust_ins = "G6. What improvements or changes would you like to see in agricultural insurance offerings for farmers?/Customized insurance", 
+    g6_compreh_cover = "G6. What improvements or changes would you like to see in agricultural insurance offerings for farmers?/Comprehensive coverage for risks",  
+    g6_access_mobile = "G6. What improvements or changes would you like to see in agricultural insurance offerings for farmers?/Improved accessibility via mobile",  
+    g6_fair_prem = "G6. What improvements or changes would you like to see in agricultural insurance offerings for farmers?/Premiums assessed fairly",  
+    g6_flex_pay = "G6. What improvements or changes would you like to see in agricultural insurance offerings for farmers?/Flexible payment options", 
+    g6_claims_proc = "G6. What improvements or changes would you like to see in agricultural insurance offerings for farmers?/Claims process",   
+    g7 = "G7. Would you be willing to recommend agricultural insurance to other farmers in your community?",  
+    g8 = "G8. Explain your choice.",  
+    sec_knowledge_gaps = "In the next section, we are going to talk about knowledge gaps that you may have regarding insurance.",   
+    h1 = "H1. Have you participated in any insurance training in the past three years (from 2022)?", 
+    h2 = "h2. What specific aspect(s) of insurance do you feel more knowledgeable about now compared to before participating in the project?", 
+    h2_ins_proc = "h2. What specific aspect(s) of insurance do you feel more knowledgeable about now compared to before participating in the project?/Crop insurance procedures and policies",   
+    h2_imp_ins = "h2. What specific aspect(s) of insurance do you feel more knowledgeable about now compared to before participating in the project?/Importance of insurance",    
+    h2_file_claims = "h2. What specific aspect(s) of insurance do you feel more knowledgeable about now compared to before participating in the project?/How to file insurance claims",  
+    h2_eligib = "h2. What specific aspect(s) of insurance do you feel more knowledgeable about now compared to before participating in the project?/Eligibility criteria",   
+    h2_manage_uncert = "h2. What specific aspect(s) of insurance do you feel more knowledgeable about now compared to before participating in the project?/How to manage crop uncertainties",   
+    h2_prevent_loss = "h2. What specific aspect(s) of insurance do you feel more knowledgeable about now compared to before participating in the project?/How to manage crops to prevent losses", 
+    h3 = "H3. How would you rate your overall understanding of crop insurance after training?",  
+    h4 = "H4. In 2021 and before, how confident were you in your understanding of insurance?", 
+    h5 = "H5. Would you recommend insurance training to others who are interested in learning about insurance?", 
+    h6 = "H6. Are there specific topics on crop insurance that you would like to learn more about?",  
+    h6_diff_cover = "H6. Are there specific topics on crop insurance that you would like to learn more about?/Different types of coverage",     
+    h6_optim_cover = "H6. Are there specific topics on crop insurance that you would like to learn more about?/How to optimize coverage to farm needs",  
+    h6_updates = "H6. Are there specific topics on crop insurance that you would like to learn more about?/Updates to crop insurance policies",     
+    h6_ins_proc = "H6. Are there specific topics on crop insurance that you would like to learn more about?/Crop insurance procedures",     
+    h6_eligib_criter = "H6. Are there specific topics on crop insurance that you would like to learn more about?/Eligibility criteria", 
+    h6_none = "H6. Are there specific topics on crop insurance that you would like to learn more about?/None", 
+    h7 = "H7. How likely are you to apply the knowledge gained from the project in your farm?",    
+    h8 = "H8. Did you find the format and delivery of the training effective in addressing your learning needs?", 
+    h9 = "H9. What additional resources or support do you feel would help you further enhance your understanding of insurance",   
+    h10 = "H10. How do you plan to continue learning about insurance?", 
+    h11 = "H11. Any additional comments",    
+    sec_demog = "In the next section, we are going to talk about your household demographics. Your responses will provide us with valuable insights into the diverse profiles of farmers, which can help us tailor crop insurance products to better meet your specific needs",
+    b0 = "B0. Respondent ID.",   
+    b1 = "B1. Respondent phone number", 
+    b2 = "B2. Gender",     
+    b3 = "B3. How old are you?",   
+    b4 = "B4. What is the highest level of formal education you have completed?", 
+    b5 = "B5. Including yourself, how many adults and children live in your household?", 
+    b6 = "B6. What is your county of residence.",   
+    id = "_id", 
+    uuid = "_uuid",
+    index = "_index"                                                                                                                                        
+  )
+
+#names(amaizing_endlinedata_clean_v5)
+
+```
+
+#Screening and cleaning
+
+```{r}
+# Enumerators
+# Drop this column
+
+unique(amaizing_endlinedata_clean_v5$a1)
+```
+
+```{r}
+# Consent
+# Drop
+
+unique(amaizing_endlinedata_clean_v5$a2)
+```
+
+```{r}
+#Blank section column 
+# to be kept
+
+unique(amaizing_endlinedata_clean_v5$sec_crop_activity)
+```
+
+```{r}
+#crop column similar to c1
+#Drop this column
+
+unique(amaizing_endlinedata_clean_v5$crop)
+```
+
+```{r}
+# Similar to crop column above
+
+unique(amaizing_endlinedata_clean_v5$c1)
+```
+
+```{r}
+# To be cleaned
+
+
+#unique(amaizing_endlinedata_clean_v5$c1_1)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$c2)
+```
+
+-   Convert c2 to factor
+
+```{r}
+amaizing_endlinedata_clean_v5 <- amaizing_endlinedata_clean_v5 %>%
+  mutate(
+    c2 = factor(c2)
+    
+    #c2 = factor(c2, levels = c("No", "Yes"), labels = c(0, 1))
+    )
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$c2)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$c2_1)
+```
+
+```{r}
+amaizing_endlinedata_clean_v5 <- amaizing_endlinedata_clean_v5 %>%
+  mutate(
+    c2_1 = factor(c2_1)
+    )
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$c2_1)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$c2_2)
+```
+
+```{r}
+amaizing_endlinedata_clean_v5 <- amaizing_endlinedata_clean_v5 %>%
+  mutate(
+    c2_2 = factor(c2_2)
+    )
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$c2_2)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$c3)
+```
+
+```{r}
+amaizing_endlinedata_clean_v5 <- amaizing_endlinedata_clean_v5 %>%
+  mutate(
+    
+    c3 = case_when(
+      c3 == "I'm champion farmer" ~ "Champion farmer",
+      c3 == "Media (tv, radio" ~ "Media (tv, radio)", 
+      TRUE ~ c3
+    ),
+    c3 = factor(c3)
+  )
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$c3)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$c4)
+```
+
+```{r}
+
+descr(amaizing_endlinedata_clean_v5$c4) %>%
+  kable()
+
+```
+
+```{r}
+
+unique(amaizing_endlinedata_clean_v5$c5)
+```
+
+```{r}
+amaizing_endlinedata_clean_v5 <- amaizing_endlinedata_clean_v5 %>%
+  mutate(
+    c5 = factor(c5)
+    )
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$c5)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$c5_1)
+```
+
+```{r}
+# Filter rows to confirm
+
+# amaizing_endlinedata_clean_v5 %>%
+#   dplyr::select(a1, b0, b1, c5_1) %>%
+#   filter(c5_1 %in% c("Coul", "4"))
+
+# Correction was done
+```
+
+```{r}
+amaizing_endlinedata_clean_v5 <- amaizing_endlinedata_clean_v5 %>%
+  mutate(
+    c5_1 = str_to_sentence(c5_1),
+    
+    c5_1 = case_when(
+      c5_1 == "Pigeons peas" ~ "Pigeon peas" ,
+      c5_1 == "Pigeon pea" ~ "Pigeon peas" ,
+      c5_1 == "Cowpeas" ~ "Cow peas",
+      c5_1 == "Coul" ~   NA_character_,           
+      c5_1 == "4" ~ NA_character_,
+      
+      TRUE ~ c5_1
+    ),
+    c5_1 = factor(c5_1)
+  )
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$c5_1)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$c5_2)
+```
+
+```{r}
+# qtty_2021 <- amaizing_endline_data %>%
+#   group_by(c1) %>%
+#   do(data.frame(descr(.$c5_2, stats = c("mean", "sd", "min", "q1", "median", "q3", "max"), transpose = TRUE)))
+# 
+# 
+# 
+# kable(qtty_2021)
+```
+
+```{r}
+# # Install and load the psych package
+# #install.packages("psych")
+# library(psych)
+# 
+# # Group by the categorical variable and apply describe
+# qtty_2021 <- amaizing_endline_data %>%
+#   group_by(c1) %>%
+#   do(data.frame(describe(.$c5_2)))
+# 
+# # Print the results
+# kable(qtty_2021)
+
+```
+
+```{r warning=FALSE}
+# ggplot(amaizing_endline_data, aes(x=c1, y=c5_2)) + 
+#     geom_boxplot(fill="slateblue", alpha=0.2) + 
+#     xlab("crop since 2021")
+```
+
+#Filter rows with outliers
+
+```{r}
+
+# # Identify outliers based on boxplot statistics
+#  
+#   outliers <- boxplot.stats(c5_2)$out
+#   
+# # # # Display rows with outliers
+#  
+#   qtty_2021_outliers <- amaizing_endline_data %>%
+#     filter(c5_2 %in% outliers)
+#  
+#   kable(qtty_2021_outliers)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$c5_3)
+```
+
+```{r}
+amaizing_endlinedata_clean_v5 <- amaizing_endlinedata_clean_v5%>%
+  mutate(c5_3 = factor(c5_3))
+unique(amaizing_endlinedata_clean_v5$c5_3)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$c5_4)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$c6)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$c6_1)
+```
+
+```{r}
+amaizing_endlinedata_clean_v5 <- amaizing_endlinedata_clean_v5%>%
+  mutate(c6_1 = factor(c6_1))
+unique(amaizing_endlinedata_clean_v5$c6_1)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$c6_2)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$c7)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$c7_1)
+```
+
+```{r}
+amaizing_endlinedata_clean_v5 <- amaizing_endlinedata_clean_v5%>%
+  mutate(c7_1 = factor(c7_1))
+unique(amaizing_endlinedata_clean_v5$c7_1)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$c7_2)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$c8)
+```
+
+# sec_impr_pracs
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$d1)
+```
+
+```{r}
+amaizing_endlinedata_clean_v5 <- amaizing_endlinedata_clean_v5%>%
+  mutate(d1 = factor(d1))
+unique(amaizing_endlinedata_clean_v5$d1)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$d2)
+```
+
+```{r}
+amaizing_endlinedata_clean_v5 <- amaizing_endlinedata_clean_v5 %>%
+  mutate(
+    d2 = str_to_sentence(d2),
+    d2 = str_squish(d2),
+    d2 = str_remove(d2, ",\\s*$"),
+    
+    d2 = case_when(
+      d2 == "Tomato" ~ "Tomatoes",
+      d2 == "Banana" ~ "Bananas",
+      d2 == "Onion" ~ "Onions",
+      d2 %in% c("Pigeons peas", "Pigeon pea", "Pegion peas") ~ "Pigeon peas",
+      d2 == "Pumpkin" ~ "Pumpkins",
+      d2 == "Citrus oranges" ~ "Oranges",
+      d2 %in% c("Potatoes", "Irish potato") ~ "Irish potatoes",
+      d2 == "Mango" ~ "Mangoes",
+      d2 %in% c("Cow pea", "Cowpeas") ~ "Cow peas",
+      d2 == "Pawpaw" ~ "Pawpaws",
+      d2 == "Avocado" ~ "Avocadoes",
+      d2 == "Eucalyptus" ~   NA_character_,
+      d2 == "Soyabeans" ~ "Soya beans",
+      d2 == "Cowpeas" ~ "Cow peas",
+      d2 == "Groundnut" ~ "Groundnuts",
+      d2 == "Butternut" ~ "Butternuts",
+      d2 == "Cabbage" ~ "Cabbages",
+    
+    TRUE ~ d2
+     ),
+    d2 = factor(d2)
+  )
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$d2)
+```
+
+```{r}
+# Multi-select
+
+#unique(amaizing_endline_data$d3)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$d3_agrofor)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$d3_ca)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$d3_impr_seeds)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$d3_inorg_fert)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$d3_ipm)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$d3_mech_plough)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$d3_micro_drip)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$d3_none)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$d3_org_fert)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$d3_waterh)
+```
+
+```{r}
+# Multiselect
+
+#unique(amaizing_endlinedata_clean_v5$d4)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$d4_clim_res)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$d4_cost_effect)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$d4_cropins)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$d4_disease_res)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$d4_hyp)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$d4_recommend)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$d4_soil_conserv)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$d5)
+```
+
+```{r}
+amaizing_endlinedata_clean_v5 <- amaizing_endlinedata_clean_v5%>%
+  mutate(d5 = factor(d5))
+unique(amaizing_endlinedata_clean_v5$d5)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$d5_1)
+```
+
+```{r}
+amaizing_endlinedata_clean_v5 <- amaizing_endlinedata_clean_v5%>%
+  mutate(d5_1 = factor(d5_1))
+unique(amaizing_endlinedata_clean_v5$d5_1)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$d6)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$d6_1)
+```
+
+```{r}
+amaizing_endlinedata_clean_v5 <- amaizing_endlinedata_clean_v5%>%
+  mutate(d6_1 = factor(d6_1))
+unique(amaizing_endlinedata_clean_v5$d6_1)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$d6_2)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$d6_3)
+```
+
+```{r}
+amaizing_endlinedata_clean_v5 <- amaizing_endlinedata_clean_v5%>%
+  mutate(d6_3 = factor(d6_3))
+unique(amaizing_endlinedata_clean_v5$d6_3)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$e1)
+```
+
+```{r}
+amaizing_endlinedata_clean_v5 <- amaizing_endlinedata_clean_v5%>%
+  mutate(e1 = factor(e1))
+unique(amaizing_endlinedata_clean_v5$e1)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$e2)
+```
+
+```{r}
+amaizing_endlinedata_clean_v5 <- amaizing_endlinedata_clean_v5%>%
+  mutate(e2 = factor(e2))
+unique(amaizing_endlinedata_clean_v5$e2)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$e3)
+```
+
+```{r}
+amaizing_endlinedata_clean_v5 <- amaizing_endlinedata_clean_v5%>%
+  mutate(e3 = factor(e3))
+unique(amaizing_endlinedata_clean_v5$e3)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$f1)
+```
+
+```{r}
+amaizing_endlinedata_clean_v5 <- amaizing_endlinedata_clean_v5%>%
+  mutate(f1 = factor(f1))
+unique(amaizing_endlinedata_clean_v5$f1)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$f2)
+```
+
+```{r}
+amaizing_endlinedata_clean_v5 <- amaizing_endlinedata_clean_v5%>%
+  mutate(f2 = factor(f2))
+unique(amaizing_endlinedata_clean_v5$f2)
+```
+
+```{r}
+# Multiselect
+
+#unique(amaizing_endline_data$f3)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$f3_div_crop)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$f3_drought_res)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$f3_agric_ins)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$f3_adjus_time)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$f3_irrign)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$f3_ipm)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$f3_slm)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$f3_none)
+```
+
+```{r}
+#Multiselect
+
+#unique(amaizing_endline_data$f4)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$f4_divers_crop)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$f4_drought_res)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$f4_agric_ins)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$f4_adjust_time)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$f4_irrigation)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$f4_ipm)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$f4_slm)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$f4_none)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$f5_scale)
+```
+
+Not at all helpful Slightly helpful Moderately helpful Very helpful Extremely helpful
+
+```{r}
+amaizing_endlinedata_clean_v5 <- amaizing_endlinedata_clean_v5 %>%
+  mutate(
+    f5_scale = factor(f5_scale, 
+                      levels = c(1,2,3,4,5), 
+                      labels = c("Not at all helpful","Slightly helpful","Moderately helpful","Very helpful","Extremely helpful"), 
+                      ordered = TRUE)
+    ) 
+
+unique(amaizing_endlinedata_clean_v5$f5_scale)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$f6_no_ins)
+```
+
+```{r}
+amaizing_endlinedata_clean_v5 <- amaizing_endlinedata_clean_v5%>%
+  mutate(f6_no_ins = factor(f6_no_ins))
+unique(amaizing_endlinedata_clean_v5$f6_no_ins)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$f7)
+```
+
+```{r}
+amaizing_endlinedata_clean_v5 <- amaizing_endlinedata_clean_v5%>%
+  mutate(f7 = factor(f7))
+unique(amaizing_endlinedata_clean_v5$f7)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$g1)
+```
+
+```{r}
+amaizing_endlinedata_clean_v5 <- amaizing_endlinedata_clean_v5%>%
+  mutate(g1 = factor(g1))
+unique(amaizing_endlinedata_clean_v5$g1)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$g2)
+```
+
+```{r}
+amaizing_endlinedata_clean_v5 <- amaizing_endlinedata_clean_v5%>%
+  mutate(g2 = factor(g2))
+unique(amaizing_endlinedata_clean_v5$g2)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$g3)
+```
+
+```{r}
+amaizing_endlinedata_clean_v5 <- amaizing_endlinedata_clean_v5%>%
+  mutate(g3 = factor(g3))
+unique(amaizing_endlinedata_clean_v5$g3)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$g4)
+```
+
+```{r}
+amaizing_endlinedata_clean_v5 <- amaizing_endlinedata_clean_v5%>%
+  mutate(g4 = factor(g4))
+unique(amaizing_endlinedata_clean_v5$g4)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$g5)
+```
+
+```{r}
+amaizing_endlinedata_clean_v5 <- amaizing_endlinedata_clean_v5%>%
+  mutate(g5 = factor(g5))
+unique(amaizing_endlinedata_clean_v5$g5)
+```
+
+```{r}
+#Multiselect
+
+#unique(amaizing_endline_data$g6)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$g6_afford_prem)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$g6_simp_proc)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$g6_clear_terms)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$g6_increas_educ)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$g6_cust_ins)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$g6_compreh_cover)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$g6_access_mobile)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$g6_fair_prem)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$g6_flex_pay)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$g6_claims_proc)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$g7)
+```
+
+```{r}
+amaizing_endlinedata_clean_v5 <- amaizing_endlinedata_clean_v5%>%
+  mutate(g7 = factor(g7))
+unique(amaizing_endlinedata_clean_v5$g7)
+```
+
+```{r}
+#Empty column
+#to be kept
+unique(amaizing_endlinedata_clean_v5$g8)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$h1)
+```
+
+```{r}
+amaizing_endlinedata_clean_v5 <- amaizing_endlinedata_clean_v5%>%
+  mutate(h1 = factor(h1))
+unique(amaizing_endlinedata_clean_v5$h1)
+```
+
+```{r}
+#Multiselect
+#unique(amaizing_endline_data$h2)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$h2_ins_proc)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$h2_imp_ins)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$h2_file_claims)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$h2_eligib)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$h2_manage_uncert)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$h2_prevent_loss)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$h3)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$h4)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$h5)
+```
+
+```{r}
+amaizing_endlinedata_clean_v5 <- amaizing_endlinedata_clean_v5%>%
+  mutate(h5 = factor(h5))
+unique(amaizing_endlinedata_clean_v5$h5)
+```
+
+```{r}
+#Multiselect
+
+#unique(amaizing_endline_data$h6)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$h6_diff_cover)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$h6_eligib_criter)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$h6_ins_proc)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$h6_none)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$h6_optim_cover)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$h6_updates)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$h7)
+```
+
+```{r}
+h7_levels <- c("Less likely", "Likely")
+
+amaizing_endlinedata_clean_v5 <- amaizing_endlinedata_clean_v5%>%
+  mutate(
+    h7 = factor(h7, levels = h7_levels, order = TRUE)
+    )
+unique(amaizing_endlinedata_clean_v5$h7)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$h8)
+```
+
+```{r}
+amaizing_endlinedata_clean_v5 <- amaizing_endlinedata_clean_v5%>%
+  mutate(h8 = factor(h8))
+unique(amaizing_endlinedata_clean_v5$h8)
+```
+
+```{r}
+#open-ended
+
+#unique(amaizing_endlinedata_clean_v5$h9)
+```
+
+```{r}
+#Open-ended
+#unique(amaizing_endlinedata_clean_v5$h10)
+```
+
+```{r}
+#Empty column - comments
+#To be kept - drop when survey ends
+unique(amaizing_endlinedata_clean_v5$h11)
+```
+
+```{r}
+#assigned ids
+#unique(amaizing_endlinedata_clean_v5$b0)
+```
+
+# Incorrect respondent IDs
+
+```{r}
+
+filtered_ids_V5 <- amaizing_endlinedata_clean_v5 %>%
+  #dplyr::select(a1, id, b0, b1, b6,  index) %>%
+  filter(!grepl("^(th|ch)\\d+", b0)) 
+  
+dim(filtered_ids_V5)
+
+readr::write_csv(filtered_ids_V5, "filtered_ids_V5.csv")
+```
+
+***id column is not cleaned***
+
+```{r}
+# Phone numbers
+#unique(amaizing_endlinedata_clean_v5$b1)
+
+
+```
+
+# Incorrect phone numbers
+
+```{r}
+
+# Filter rows that do not have exactly 9-digit figures or contain non-digit characters
+#mutate(b1 = trimws(b1)) %>% # remove any leading or trailing whitespace - from base R
+
+filtered_phone_V5 <- amaizing_endlinedata_clean_v5 %>%
+  
+  mutate(
+    b1 = as.character(b1),
+    b1 = str_trim(b1) # remove any leading or trailing whitespace - from stringr package
+    ) %>% 
+  #dplyr::select(a1, b0, b1, b6,  index) %>%
+  filter(!grepl("^\\d{9}$", b1))
+
+filtered_phone_V5
+
+readr::write_csv(filtered_phone_V5, "filtered_phone_V5.csv")
+
+```
+
+Index 1845 is a blank submission.
+
+```{r}
+
+amaizing_endlinedata_clean_v5 <- amaizing_endlinedata_clean_v5 %>%
+  mutate(
+    b1 = as.character(b1),
+    b1 = case_when(
+      b1 == "2182" ~ "711574555",
+      b1 == "3390" ~ "702627775", 
+      b1 == "11" ~ "790084247",
+      b1 == 1427 ~ "706619101",
+      TRUE ~ b1
+    )
+    
+  )
+
+amaizing_endlinedata_clean_v5 %>%
+  dplyr::select(a1, id, b0, b1, b6,  index) %>%
+  filter(index %in% c(595, 1040, 1096, 1624, 1845))
+```
+
+# Find duplicate rows in phone
+
+```{r}
+# Find duplicate rows in phone
+dup_rows_phone_V5 <- amaizing_endlinedata_clean_v5 %>%
+  #dplyr::select(a1, b0, b1, b6,  index) %>%
+  filter(duplicated(b1) | duplicated(b1, fromLast = TRUE))
+
+
+
+dim(dup_rows_phone_V5)
+
+readr::write_csv(dup_rows_phone_V5, "dup_rows_phone_V5.csv")
+```
+
+# Find duplicate rows in id (b0) column (not in dup_rows_phone_V3)
+
+```{r}
+# Find duplicate rows in id column (not in dup_rows_phone_V3)
+dup_rows_id_V5 <- amaizing_endlinedata_clean_v5 %>%
+  filter(!(b1 %in% dup_rows_phone_V5$b1)) %>%
+  filter(duplicated(b0) | duplicated(b0, fromLast = TRUE)) %>%
+  dplyr::select(a1, b0, b1, b6,  index) 
+
+dim(dup_rows_id_V5)
+
+
+#readr::write_csv(dup_rows_id_V5, "dup_rows_id_V5.csv")
+```
+
+```{r}
+# Check for duplicates across all columns
+
+dup_rows_V5 <- amaizing_endlinedata_clean_v5[duplicated(amaizing_endlinedata_clean_v5) |duplicated(amaizing_endlinedata_clean_v5, fromLast = TRUE), ]
+
+
+
+dup_rows_V5
+
+# No duplicate rows
+```
+
+# Check blank rows
+
+```{r}
+# Requires package datawizard
+subset_amaizing_endlinedata_clean_v5 <- amaizing_endlinedata_clean_v5 %>%
+  dplyr::select(9:128)
+
+empty_rows(subset_amaizing_endlinedata_clean_v5) # returns index for which rows are blank
+
+#names(amaizing_endlinedata_v5)
+```
+
+\~~~Index 1845 is blank as seen under Incorrect phone numbers above~~\~
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$b2)
+```
+
+```{r}
+amaizing_endlinedata_clean_v5 <- amaizing_endlinedata_clean_v5 %>%
+  mutate(
+    b2 = factor(b2, levels = c("Male", "Female"))
+    
+    )
+
+unique(amaizing_endlinedata_clean_v5$b2)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$b3)
+```
+
+```{r}
+b3_levels <- c("18 - 25 Years", "26 - 35 Years", "36 - 45 Years", "46 - 55 Years", "Above 55 Years")
+
+amaizing_endlinedata_clean_v5 <- amaizing_endlinedata_clean_v5 %>%
+  mutate(
+    b3 = factor(b3,
+                levels = b3_levels,
+                ordered = TRUE)
+    )
+
+unique(amaizing_endlinedata_clean_v5$b3)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$b4)
+```
+
+```{r}
+b4_levels <- c("No formal education", "Primary education", "Secondary education", "Vocational/Technical training", "Tertiary/University education", "Postgraduate education")
+
+amaizing_endlinedata_clean_v5 <- amaizing_endlinedata_clean_v5 %>%
+  mutate(
+    b4 = factor(b4,
+                levels = b4_levels,
+                ordered = TRUE)
+    )
+
+unique(amaizing_endlinedata_clean_v5$b4)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$b5)
+```
+
+```{r}
+unique(amaizing_endlinedata_clean_v5$b6)
+```
+
+```{r}
+amaizing_endlinedata_clean_v5 <- amaizing_endlinedata_clean_v5 %>%
+  mutate(
+    b6 = factor(b6)
+    )
+
+unique(amaizing_endlinedata_clean_v5$b6)
+```
+
+```{r}
+#unique(amaizing_endlinedata_clean_v5$id)
+```
+
+```{r}
+#unique(amaizing_endlinedata_clean_v5$index)
+```
+
+# Drop columns
+
+```{r}
+
+#names(amaizing_endlinedata_clean_v5)
+
+amaizing_endlinedata_clean_v5 <- amaizing_endlinedata_clean_v5 #%>%
+  #dplyr::select(-c(a1, a2, crop, h11))
+
+dim(amaizing_endlinedata_clean_v5)
+```
+
+# Drop rows with duplicated phone numbers
+
+***Check this after corrections***
+
+```{r}
+amaizing_endlinedata_clean_v5 <- amaizing_endlinedata_clean_v5 %>%
+  filter(!b1 %in% dup_rows_phone_V5$b1)
+
+dim(amaizing_endlinedata_clean_v5)
+
+```
+
+```{r}
+ # Define column labels
+
+
+column_labels <- c(
+    a1 = "A1. Name of the enumerator.",  
+    a2 = "A2. Do you agree to participate in this interview?",  
+    sec_crop_activity = "In the next section we are going to talk about your cropping activities",  
+    crop = "crop",
+    c1 = "C1. Which crops have you been planting since 2021?",   
+    c1_1 = "C1.1. Which other crops are you currently doing 2023?", 
+    c2 = "C2. Did you buy crop insurance cover in 2022 and or 2023?",  
+    c2_1 =  "C2.1. Did you buy insurance for crop?",   
+    c2_2 = "C2.2. From which provider did you buy from?",  
+    c3 = "C3. Who informed you about insurance?", 
+    c4 = "C4. How many acres of land do you use for farming crop?", 
+    c5 = "C5. Is the crop in 2021 different from 2022/2023 crop?", 
+    c5_1 = "C5.1. If yes, which crop was it?",
+    c5_2 = "C5.2. Quantity of CROP harvested in 2021?",    
+    c5_3 = "C5.3. Unit of CROP harvested in 2021?",   
+    c5_4 = "C5.4. Prevailing price of a c53 of CROP  in 2021?", 
+    c6 = "C6. Quantity of crop harvested in 2022 or 2023?",  
+    c6_1 = "C6.1. Unit of crop harvested in that year?", 
+    c6_2 = "C6.2. Prevailing price of a c61 of crop in that year?",  
+    c7 = "C7. Quantity of crop  harvested in 2023?",  
+    c7_1 = "C7.1. Unit of crop harvested in 2023?", 
+    c7_2 = "C7.2. Prevailing price of a c71 of crop  in 2023?",  
+    c8 = "C8. By how many acres are you interested in increasing the land under crop?",
+    sec_impr_pracs = "In the next section, we will talk about improved practices you have introduced in your farm within the past two years",  
+    d1 = "D1. Are there any other crops, besides maize, green grams, beans and sorghum, that you would like to insure?",  
+    d2 = "D2. Which OTHER crop would you MAINLY want to cover?",    
+    d3 = "D3. Which on-farm investments or technologies have you introduced to your farm since 2022?",  
+    d3_impr_seeds = "D3. Which on-farm investments or technologies have you introduced to your farm since 2022?/Improved seeds",   
+    d3_inorg_fert = "D3. Which on-farm investments or technologies have you introduced to your farm since 2022?/Inorganic fertilizer",    
+    d3_org_fert = "D3. Which on-farm investments or technologies have you introduced to your farm since 2022?/Organic fertilizer",  
+    d3_waterh = "D3. Which on-farm investments or technologies have you introduced to your farm since 2022?/Water harvesting",   
+    d3_micro_drip = "D3. Which on-farm investments or technologies have you introduced to your farm since 2022?/Micro dripping",   
+    d3_mech_plough = "D3. Which on-farm investments or technologies have you introduced to your farm since 2022?/Mechanized ploughing",  
+    d3_ca = "D3. Which on-farm investments or technologies have you introduced to your farm since 2022?/CA (minimum soil disturbance, crop rotation & soil cover)",   
+    d3_agrofor = "D3. Which on-farm investments or technologies have you introduced to your farm since 2022?/Agroforestry",    
+    d3_ipm = "D3. Which on-farm investments or technologies have you introduced to your farm since 2022?/Integrated pest management",    
+    d3_none = "D3. Which on-farm investments or technologies have you introduced to your farm since 2022?/None",
+    d4 = "D4. What factor(s) influenced your decision to introduce the improved practice(s)?",   
+    d4_hyp = "D4. What factor(s) influenced your decision to introduce the improved practice(s)?/Higher yield potential",   
+    d4_cropins = "D4. What factor(s) influenced your decision to introduce the improved practice(s)?/Accessibility due to crop insurance",  
+    d4_disease_res = "D4. What factor(s) influenced your decision to introduce the improved practice(s)?/Disease resistance",  
+    d4_clim_res = "D4. What factor(s) influenced your decision to introduce the improved practice(s)?/Climate resilience", 
+    d4_cost_effect = "D4. What factor(s) influenced your decision to introduce the improved practice(s)?/Cost-effectiveness",    
+    d4_recommend = "D4. What factor(s) influenced your decision to introduce the improved practice(s)?/Recommendation by other farmers/extension officers", 
+    d4_soil_conserv = "D4. What factor(s) influenced your decision to introduce the improved practice(s)?/Soil conservation", 
+    d5 = "D5. Have you noticed an increase in crop yield since introducing the improved practice(s)?", 
+    d5_1 = "D5.1 Is this change different from the change in Module C",  
+    d6 = "D6. Quantity",     
+    d6_1 = "D6.1. By how much?",  
+    d6_2 = "D6.2. Quantity",  
+    d6_3 = "D6.3. By how much?",  
+    e1 = "E1. In 2021, did your family face situations where you were not sure where your next meal would come from, or were there days when some household members went to sleep without consuming enough food?",
+    e2 = "E2. In the last 6 months, have you worried about not having enough food for you or your family members?", 
+    e3 = "E3. Do you think that after purchasing insurance coverage, your family had stable access to diverse and nutritious food commodities?",    
+    sec_risk_mgt = "In the next section, we are going to talk about risk management practices on your farm.", 
+    f1 = "F1. In 2021, did you experience crop failure (loss or poor harvest)?",  
+    f2 = "F2. In the last 6 months, have you experienced crop failure (loss or poor harvest)?", 
+    f3 = "F3. Which risk management strategies did you implement on your farm in 2021 and before?", 
+    f3_div_crop = "F3. Which risk management strategies did you implement on your farm in 2021 and before?/Diversifying crops",  
+    f3_drought_res = "F3. Which risk management strategies did you implement on your farm in 2021 and before?/Using drought-resistant varieties",   
+    f3_agric_ins = "F3. Which risk management strategies did you implement on your farm in 2021 and before?/Purchasing agricultural insurance",  
+    f3_adjus_time = "F3. Which risk management strategies did you implement on your farm in 2021 and before?/Adjusting planting or harvesting times", 
+    f3_irrign = "F3. Which risk management strategies did you implement on your farm in 2021 and before?/Irrigation",
+    f3_ipm = "F3. Which risk management strategies did you implement on your farm in 2021 and before?/IPM", 
+    f3_slm = "F3. Which risk management strategies did you implement on your farm in 2021 and before?/SLM", 
+    f3_none = "F3. Which risk management strategies did you implement on your farm in 2021 and before?/None of the above",    
+    f4 = "F4. Which risk management strategies did you implement on your farm in the last one year?",  
+    f4_divers_crop = "F4. Which risk management strategies did you implement on your farm in the last one year?/Diversifying crops",   
+    f4_drought_res = "F4. Which risk management strategies did you implement on your farm in the last one year?/Using drought-resistant varieties",  
+    f4_agric_ins = "F4. Which risk management strategies did you implement on your farm in the last one year?/Purchasing agricultural insurance",  
+    f4_adjust_time = "F4. Which risk management strategies did you implement on your farm in the last one year?/Adjusting planting or harvesting times", 
+    f4_irrigation = "F4. Which risk management strategies did you implement on your farm in the last one year?/Irrigation",    
+    f4_ipm = "F4. Which risk management strategies did you implement on your farm in the last one year?/IPM",  
+    f4_slm = "F4. Which risk management strategies did you implement on your farm in the last one year?/SLM", 
+    f4_none = "F4. Which risk management strategies did you implement on your farm in the last one year?/None of the above",    
+    f5_scale = "F5. On a scale of 1 to 5, how has the insurance product helped you manage farm risks?  \r\n\r\n1 being \"not at all helpful\" and 5 being \"extremely helpful", 
+    f6_no_ins = "F6. What is the main reason for not purchasing the insurance product despite registering for the project?", 
+    f7 = "F7. What would have MAINLY motivated you to purchase crop insurance?",
+    sec_ins_percn = "In the next section, we will talk about your perceptions on insurance.", 
+    g1 = "G1. Are you familiar with agricultural insurance options available for farmers in your area?",
+    g2 = "G2. In your opinion, what is the MAIN benefit of having crop insurance?",  
+    g3 = "G3. What do you think about the affordability of the premiums?",  
+    g4 = "G4. What challenge or barrier have you MAINLY faced in accessing agricultural insurance?",
+    g5 = "G5. Do you think the current agricultural insurance options meet the needs of farmers in your community?",
+    g6 = "G6. What improvements or changes would you like to see in agricultural insurance offerings for farmers?",
+    g6_afford_prem = "G6. What improvements or changes would you like to see in agricultural insurance offerings for farmers?/Affordable premiums", 
+    g6_simp_proc = "G6. What improvements or changes would you like to see in agricultural insurance offerings for farmers?/Simplified application processes",  
+    g6_clear_terms = "G6. What improvements or changes would you like to see in agricultural insurance offerings for farmers?/Clear terms",   
+    g6_increas_educ = "G6. What improvements or changes would you like to see in agricultural insurance offerings for farmers?/Increased education",  
+    g6_cust_ins = "G6. What improvements or changes would you like to see in agricultural insurance offerings for farmers?/Customized insurance", 
+    g6_compreh_cover = "G6. What improvements or changes would you like to see in agricultural insurance offerings for farmers?/Comprehensive coverage for risks",  
+    g6_access_mobile = "G6. What improvements or changes would you like to see in agricultural insurance offerings for farmers?/Improved accessibility via mobile",  
+    g6_fair_prem = "G6. What improvements or changes would you like to see in agricultural insurance offerings for farmers?/Premiums assessed fairly",  
+    g6_flex_pay = "G6. What improvements or changes would you like to see in agricultural insurance offerings for farmers?/Flexible payment options", 
+    g6_claims_proc = "G6. What improvements or changes would you like to see in agricultural insurance offerings for farmers?/Claims process",   
+    g7 = "G7. Would you be willing to recommend agricultural insurance to other farmers in your community?",  
+    g8 = "G8. Explain your choice.",  
+    sec_knowledge_gaps = "In the next section, we are going to talk about knowledge gaps that you may have regarding insurance.",   
+    h1 = "H1. Have you participated in any insurance training in the past three years from 2022?", 
+    h2 = "h2. What specific aspect(s) of insurance do you feel more knowledgeable about now compared to before participating in the project?", 
+    h2_ins_proc = "h2. What specific aspect(s) of insurance do you feel more knowledgeable about now compared to before participating in the project?/Crop insurance procedures and policies",   
+    h2_imp_ins = "h2. What specific aspect(s) of insurance do you feel more knowledgeable about now compared to before participating in the project?/Importance of insurance",    
+    h2_file_claims = "h2. What specific aspect(s) of insurance do you feel more knowledgeable about now compared to before participating in the project?/How to file insurance claims",  
+    h2_eligib = "h2. What specific aspect(s) of insurance do you feel more knowledgeable about now compared to before participating in the project?/Eligibility criteria",   
+    h2_manage_uncert = "h2. What specific aspect(s) of insurance do you feel more knowledgeable about now compared to before participating in the project?/How to manage crop uncertainties",   
+    h2_prevent_loss = "h2. What specific aspect(s) of insurance do you feel more knowledgeable about now compared to before participating in the project?/How to manage crops to prevent losses", 
+    h3 = "H3. How would you rate your overall understanding of crop insurance after training?",  
+    h4 = "H4. In 2021 and before, how confident were you in your understanding of insurance?", 
+    h5 = "H5. Would you recommend insurance training to others who are interested in learning about insurance?", 
+    h6 = "H6. Are there specific topics on crop insurance that you would like to learn more about?",  
+    h6_diff_cover = "H6. Are there specific topics on crop insurance that you would like to learn more about?/Different types of coverage",     
+    h6_optim_cover = "H6. Are there specific topics on crop insurance that you would like to learn more about?/How to optimize coverage to farm needs",  
+    h6_updates = "H6. Are there specific topics on crop insurance that you would like to learn more about?/Updates to crop insurance policies",     
+    h6_ins_proc = "H6. Are there specific topics on crop insurance that you would like to learn more about?/Crop insurance procedures",     
+    h6_eligib_criter = "H6. Are there specific topics on crop insurance that you would like to learn more about?/Eligibility criteria", 
+    h6_none = "H6. Are there specific topics on crop insurance that you would like to learn more about?/None", 
+    h7 = "H7. How likely are you to apply the knowledge gained from the project in your farm?",    
+    h8 = "H8. Did you find the format and delivery of the training effective in addressing your learning needs?", 
+    h9 = "H9. What additional resources or support do you feel would help you further enhance your understanding of insurance",   
+    h10 = "H10. How do you plan to continue learning about insurance?", 
+    h11 = "H11. Any additional comments",    
+    sec_demog = "In the next section, we are going to talk about your household demographics. Your responses will provide us with valuable insights into the diverse profiles of farmers, which can help us tailor crop insurance products to better meet your specific needs",
+    b0 = "B0. Respondent ID.",   
+    b1 = "B1. Respondent phone number", 
+    b2 = "B2. Gender",     
+    b3 = "B3. How old are you?",   
+    b4 = "B4. What is the highest level of formal education you have completed?", 
+    b5 = "B5. Including yourself, how many adults and children live in your household?", 
+    b6 = "B6. What is your county of residence.",   
+    id = "id",  
+    uuid = "_uuid",
+    index = "index"          
+    )
+
+```
+
+```{r}
+# Set variable/column labels
+
+   amaizing_endlinedata_clean_v5 <- amaizing_endlinedata_clean_v5 %>%
+     set_variable_labels(.labels = column_labels) # Requires package labelled
+
+```
+
+## Generate a data dictionary
+
+```{r}
+# Data dictionary
+
+amaizing_endlinedata_clean_v5_dict <- look_for(amaizing_endlinedata_clean_v5, labels = TRUE, values = TRUE) %>%
+  dplyr::select(-c(missing, value_labels))
+
+gt(amaizing_endlinedata_clean_v5_dict)
+
+```
+
+# Export dictionary to csv
+
+```{r}
+readr::write_csv(amaizing_endlinedata_clean_v5_dict, "amaizing_endlinedata_clean_v5_dict.csv")
+
+```
+
+## Export data to CSV
+
+```{r}
+
+readr::write_csv(amaizing_endlinedata_clean_v5, "amaizing_endlinedata_clean_v5.csv")
+
+```
+
+## Save as R data
+
+```{r}
+
+save(amaizing_endlinedata_clean_v5, file = "amaizing_endlinedata_clean_v5.RData")
+```
+
+## Export data to SPSS
+
+```{r}
+
+write.foreign(amaizing_endlinedata_clean_v5, "amaizing_endlinedata_clean_v5.sav", "amaizing_endlinedata_clean_v5", package = "SPSS")
+
+```
+
+## Export data to STATA
+
+```{r}
+
+write_dta(amaizing_endlinedata_clean_v5, "amaizing_endlinedata_clean_v5.dta")
+
+```
